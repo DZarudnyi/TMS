@@ -22,7 +22,7 @@ public interface UserMapper {
 
     UserDto toDto(User user);
 
-    @Mapping(target = "roles", source = "roleIds")
+    @Mapping(source = "roleIds", target = "roles")
     User toEntity(UpdateUserRoleRequestDto requestDto);
 
     UpdateUserRoleResponseDto toDtoWithRoles(User user);

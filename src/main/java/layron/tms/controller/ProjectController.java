@@ -1,5 +1,6 @@
 package layron.tms.controller;
 
+import java.util.List;
 import layron.tms.dto.project.CreateProjectRequestDto;
 import layron.tms.dto.project.ProjectDto;
 import layron.tms.dto.project.UpdateProjectRequestDto;
@@ -14,19 +15,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectController {
     private final ProjectService projectService;
 
+    //TODO: Check format for endDate in incoming dto
     @PostMapping
     public ProjectDto createProject(@RequestBody CreateProjectRequestDto requestDto) {
         return projectService.save(requestDto);
     }
-//@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dateStart,
 
     @GetMapping
     public List<ProjectDto> getUserProjects() {
