@@ -7,13 +7,14 @@ import layron.tms.dto.user.UserDto;
 import layron.tms.dto.user.UserRegistrationResponseDto;
 import layron.tms.dto.user.UserRegistrationRequestDto;
 import layron.tms.exception.RegistrationException;
+import layron.tms.exception.UserNotFoundException;
 
 public interface UserService {
     UserRegistrationResponseDto register(UserRegistrationRequestDto requestDto) throws RegistrationException;
 
-    UserDto getUser();
+    UserDto getUser() throws UserNotFoundException;
 
-    UserDto updateUser(UpdateUserRequestDto requestDto);
+    UserDto updateUser(UpdateUserRequestDto requestDto) throws UserNotFoundException;
 
-    UpdateUserRoleResponseDto updateUserRoles(Long id, UpdateUserRoleRequestDto requestDto);
+    UpdateUserRoleResponseDto updateUserRoles(Long id, UpdateUserRoleRequestDto requestDto) throws UserNotFoundException;
 }

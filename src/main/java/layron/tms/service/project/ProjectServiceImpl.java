@@ -25,7 +25,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
 
     @Override
-    public ProjectDto save(CreateProjectRequestDto requestDto) {
+    public ProjectDto save(
+            CreateProjectRequestDto requestDto
+    ) throws UserNotFoundException {
         Project project = projectMapper.toEntity(requestDto);
         project.setStartDate(LocalDate.now());
         project.setStatus(Status.INITIATED);
@@ -35,7 +37,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getUserProjects() {
-        return projectRepository.getProjectsByUserUsername(getUser().getUsername()).stream()
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        String username = loggedInUser.getName();
+        return projectRepository.getProjectsByUserUsername(username).stream()
                 .map(projectMapper::toDto)
                 .toList();
     }
@@ -59,10 +63,12 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteById(id);
     }
 
-    private User getUser() {
+    private User getUser() throws UserNotFoundException {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         String username = loggedInUser.getName();
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User with this username does not exist!"));
+                .orElseThrow(
+                        () -> new UserNotFoundException("User with this username does not exist!")
+                );
     }
 }

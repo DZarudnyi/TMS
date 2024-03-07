@@ -4,6 +4,7 @@ import java.util.List;
 import layron.tms.dto.project.CreateProjectRequestDto;
 import layron.tms.dto.project.ProjectDto;
 import layron.tms.dto.project.UpdateProjectRequestDto;
+import layron.tms.exception.UserNotFoundException;
 import layron.tms.service.project.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,12 +24,14 @@ public class ProjectController {
 
     //TODO: Check format for endDate in incoming dto
     @PostMapping
-    public ProjectDto createProject(@RequestBody CreateProjectRequestDto requestDto) {
+    public ProjectDto createProject(
+            @RequestBody CreateProjectRequestDto requestDto
+    ) throws UserNotFoundException {
         return projectService.save(requestDto);
     }
 
     @GetMapping
-    public List<ProjectDto> getUserProjects() {
+    public List<ProjectDto> getUserProjects() throws UserNotFoundException {
         return projectService.getUserProjects();
     }
 

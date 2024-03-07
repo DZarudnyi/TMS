@@ -36,7 +36,7 @@ public class TaskController {
 
     @GetMapping("/{projectId}/tasks/{id}")
     public TaskDto getTask(@PathVariable Long projectId, @PathVariable Long id) {
-        taskService.getTask(projectId, id);
+        return taskService.getTask(projectId, id);
     }
 
     @PutMapping("/{projectId}/tasks/{id}")

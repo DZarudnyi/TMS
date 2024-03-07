@@ -4,6 +4,7 @@ import layron.tms.dto.user.UpdateUserRequestDto;
 import layron.tms.dto.user.UpdateUserRoleRequestDto;
 import layron.tms.dto.user.UpdateUserRoleResponseDto;
 import layron.tms.dto.user.UserDto;
+import layron.tms.exception.UserNotFoundException;
 import layron.tms.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,18 +28,20 @@ public class UsersController {
     public UpdateUserRoleResponseDto updateRole(
             @PathVariable Long id,
             @RequestBody UpdateUserRoleRequestDto requestDto
-    ) {
+    ) throws UserNotFoundException {
         return userService.updateUserRoles(id, requestDto);
     }
 
     @GetMapping("/me")
-    public UserDto getMyProfile() {
+    public UserDto getMyProfile() throws UserNotFoundException {
         return userService.getUser();
     }
 
     @PatchMapping("/me")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public UserDto updateMyProfile(@RequestBody UpdateUserRequestDto requestDto) {
+    public UserDto updateMyProfile(
+            @RequestBody UpdateUserRequestDto requestDto
+    ) throws UserNotFoundException {
         return userService.updateUser(requestDto);
     }
 }

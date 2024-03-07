@@ -47,8 +47,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(savedUser);
     }
 
+    //TODO: Is there any logic to use this exception here?
     @Override
-    public UserDto getUser() {
+    public UserDto getUser() throws UserNotFoundException {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         String username = loggedInUser.getName();
         User user = userRepository.findByUsername(username)
@@ -57,7 +58,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UpdateUserRequestDto requestDto) {
+    public UserDto updateUser(
+            UpdateUserRequestDto requestDto
+    ) throws UserNotFoundException {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByUsername(loggedInUser.getName())
                 .orElseThrow(() -> new UserNotFoundException("There is no user with such username!"));
@@ -74,7 +77,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UpdateUserRoleResponseDto updateUserRoles(Long id, UpdateUserRoleRequestDto requestDto) {
+    public UpdateUserRoleResponseDto updateUserRoles(
+            Long id,
+            UpdateUserRoleRequestDto requestDto
+    ) throws UserNotFoundException {
         User userFromDb = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("There is no user with id " + id));
         User user = userMapper.toEntity(requestDto);
