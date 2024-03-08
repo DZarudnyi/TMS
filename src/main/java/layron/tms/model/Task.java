@@ -25,9 +25,9 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(value = EnumType.ORDINAL)
     private Priority priority;
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(value = EnumType.ORDINAL)
     private Status status;
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;

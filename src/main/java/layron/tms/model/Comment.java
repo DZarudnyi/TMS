@@ -29,6 +29,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    @Column(nullable = false)
     private String text;
     private LocalDateTime timestamp;
     @Column(name = "is_deleted", nullable = false)
