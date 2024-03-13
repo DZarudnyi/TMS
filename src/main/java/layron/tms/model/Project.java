@@ -2,6 +2,8 @@ package layron.tms.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,6 +30,7 @@ public class Project {
     private LocalDate startDate;
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
+    @Enumerated(value = EnumType.ORDINAL)
     private Status status;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
