@@ -53,7 +53,8 @@ public class UserServiceImpl implements UserService {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         String username = loggedInUser.getName();
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("There is no user with such username!"));
+                .orElseThrow(() ->
+                        new UserNotFoundException("There is no user with such username!"));
         return userMapper.toDto(user);
     }
 
@@ -63,7 +64,8 @@ public class UserServiceImpl implements UserService {
     ) throws UserNotFoundException {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByUsername(loggedInUser.getName())
-                .orElseThrow(() -> new UserNotFoundException("There is no user with such username!"));
+                .orElseThrow(() ->
+                        new UserNotFoundException("There is no user with such username!"));
         if (requestDto.email() != null && !requestDto.email().isEmpty()) {
             user.setEmail(requestDto.email());
         }
@@ -82,7 +84,8 @@ public class UserServiceImpl implements UserService {
             UpdateUserRoleRequestDto requestDto
     ) throws UserNotFoundException {
         User userFromDb = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("There is no user with id " + id));
+                .orElseThrow(() ->
+                        new UserNotFoundException("There is no user with id " + id));
         User user = userMapper.toEntity(requestDto);
         userFromDb.setRoles(user.getRoles());
         return userMapper.toDtoWithRoles(userFromDb);

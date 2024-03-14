@@ -1,10 +1,10 @@
 package layron.tms.controller;
 
 import jakarta.validation.Valid;
-import layron.tms.dto.user.UserRegistrationRequestDto;
-import layron.tms.dto.user.UserRegistrationResponseDto;
 import layron.tms.dto.user.UserLoginRequestDto;
 import layron.tms.dto.user.UserLoginResponseDto;
+import layron.tms.dto.user.UserRegistrationRequestDto;
+import layron.tms.dto.user.UserRegistrationResponseDto;
 import layron.tms.exception.RegistrationException;
 import layron.tms.security.AuthenticationService;
 import layron.tms.service.user.UserService;
@@ -25,8 +25,9 @@ public class AuthenticationController {
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserRegistrationResponseDto register(@RequestBody @Valid UserRegistrationRequestDto requestDto)
-            throws RegistrationException {
+    public UserRegistrationResponseDto register(
+            @RequestBody @Valid UserRegistrationRequestDto requestDto
+    ) throws RegistrationException {
         return userService.register(requestDto);
     }
 

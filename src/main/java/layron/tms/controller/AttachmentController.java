@@ -1,9 +1,8 @@
 package layron.tms.controller;
 
+import com.dropbox.core.DbxException;
 import java.io.IOException;
 import java.util.List;
-
-import com.dropbox.core.DbxException;
 import layron.tms.dto.attachment.AttachmentDto;
 import layron.tms.service.attachment.AttachmentService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/attachments")
 public class AttachmentController {
-    AttachmentService attachmentService;
+    private final AttachmentService attachmentService;
 
     @PostMapping
     public AttachmentDto uploadAttachment(

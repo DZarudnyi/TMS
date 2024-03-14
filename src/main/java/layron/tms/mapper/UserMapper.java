@@ -1,5 +1,8 @@
 package layron.tms.mapper;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import layron.tms.config.MapperConfig;
 import layron.tms.dto.user.UpdateUserRoleRequestDto;
 import layron.tms.dto.user.UpdateUserRoleResponseDto;
@@ -11,10 +14,6 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(config = MapperConfig.class, componentModel = "spring")
 public interface UserMapper {
@@ -28,7 +27,10 @@ public interface UserMapper {
     UpdateUserRoleResponseDto toDtoWithRoles(User user);
 
     @AfterMapping
-    default UpdateUserRoleResponseDto setRoleIds(@MappingTarget UpdateUserRoleResponseDto responseDto, User user) {
+    default UpdateUserRoleResponseDto setRoleIds(
+            @MappingTarget UpdateUserRoleResponseDto responseDto,
+            User user
+    ) {
         if (user.getRoles() == null) {
             return responseDto;
         }

@@ -14,6 +14,11 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: task_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
                   name: dropbox_file_id
                   type: varchar(255)
                   constraints:
@@ -35,3 +40,9 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: task_id
+            baseTableName: attachments
+            constraintName: FK_attachments_task_id
+            referencedColumnNames: id
+            referencedTableName: tasks

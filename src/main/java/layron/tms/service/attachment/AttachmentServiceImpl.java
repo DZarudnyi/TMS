@@ -37,7 +37,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setFilename(file.getName());
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes());
-        FileMetadata uploadMetadata = dropboxClient.files().uploadBuilder("myfilepath").uploadAndFinish(inputStream);
+        FileMetadata uploadMetadata = dropboxClient
+                .files()
+                .uploadBuilder("myfilepath")
+                .uploadAndFinish(inputStream);
         inputStream.close();
 
         attachment.setUploadDate(LocalDateTime.now());
@@ -47,7 +50,9 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<ResponseEntity<InputStreamResource>> getAttachmentsForTask(Long taskId) throws DbxException {
+    public List<ResponseEntity<InputStreamResource>> getAttachmentsForTask(
+            Long taskId
+    ) throws DbxException {
         List<Attachment> attachmentsForTask = attachmentRepository.getAttachmentByTaskId(taskId);
         List<ResponseEntity<InputStreamResource>> downloadedFiles = new ArrayList<>();
         for (Attachment attachment : attachmentsForTask) {

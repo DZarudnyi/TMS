@@ -51,7 +51,7 @@ databaseChangeLog:
                     nullable: false
         - addForeignKeyConstraint:
             baseColumnNames: project_id
-            baseTableName: projects
+            baseTableName: tasks
             constraintName: FK_tasks_project_id
             referencedColumnNames: id
             referencedTableName: projects
