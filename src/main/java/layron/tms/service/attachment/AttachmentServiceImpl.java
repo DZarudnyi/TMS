@@ -4,21 +4,22 @@ import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import layron.tms.dto.attachment.AttachmentDto;
 import layron.tms.mapper.AttachmentMapper;
 import layron.tms.model.Attachment;
 import layron.tms.model.Task;
 import layron.tms.repository.AttachmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,13 +47,20 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<MultipartFile> getAttachmentsForTask(Long taskId) throws DbxException {
+    public List<ResponseEntity<InputStreamResource>> getAttachmentsForTask(Long taskId) throws DbxException {
         List<Attachment> attachmentsForTask = attachmentRepository.getAttachmentByTaskId(taskId);
-        List<MultipartFile> downloadedFiles = new ArrayList<>();
-        for (Attachment attachement : attachmentsForTask) {
-            DbxDownloader<FileMetadata> downloadedFile = dropboxClient.files().download(attachement.getDropboxFileId());//listFolder(fileId)
-            InputStream inputStream = downloadedFile.getInputStream();
+        List<ResponseEntity<InputStreamResource>> downloadedFiles = new ArrayList<>();
+        for (Attachment attachment : attachmentsForTask) {
+            DbxDownloader<FileMetadata> downloadedFile = dropboxClient
+                    .files()
+                    .download(attachment.getDropboxFileId());
+            MediaType contentType = MediaType.parseMediaType(downloadedFile.getContentType());
+            downloadedFiles.add(
+                    ResponseEntity.ok()
+                            .contentType(contentType)
+                            .body(new InputStreamResource(downloadedFile.getInputStream()))
+            );
         }
-        return null;
+        return downloadedFiles;
     }
 }

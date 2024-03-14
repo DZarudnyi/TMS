@@ -7,6 +7,8 @@ import com.dropbox.core.DbxException;
 import layron.tms.dto.attachment.AttachmentDto;
 import layron.tms.service.attachment.AttachmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +31,9 @@ public class AttachmentController {
     }
 
     @GetMapping
-    public List<MultipartFile> getAttachmentsForTask(@RequestParam Long taskId) {
+    public List<ResponseEntity<InputStreamResource>> getAttachmentsForTask(
+            @RequestParam Long taskId
+    ) throws DbxException {
         return attachmentService.getAttachmentsForTask(taskId);
     }
 }
