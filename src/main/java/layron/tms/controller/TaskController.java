@@ -6,6 +6,7 @@ import layron.tms.dto.task.TaskDto;
 import layron.tms.dto.task.UpdateTaskRequestDto;
 import layron.tms.service.task.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/{projectId}/tasks")
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskDto createTask(
             @PathVariable Long projectId,
             @RequestBody CreateTaskRequestDto requestDto
@@ -40,6 +43,7 @@ public class TaskController {
     }
 
     @PutMapping("/{projectId}/tasks/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public TaskDto updateTask(
             @PathVariable Long projectId,
             @PathVariable Long id,
