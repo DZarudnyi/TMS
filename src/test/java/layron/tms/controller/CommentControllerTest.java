@@ -1,7 +1,14 @@
 package layron.tms.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import layron.tms.dto.comment.CommentDto;
 import layron.tms.dto.comment.PostCommentRequestDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -18,12 +25,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.UnsupportedEncodingException;
-
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @Sql(scripts = {
         "classpath:database/delete-all-from-comments.sql",
         "classpath:database/delete-all-from-tasks.sql",
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CommentControllerTest {
     protected static MockMvc mockMvc;
+    private static final Long DEFAULT_ID = 1L;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -49,8 +51,9 @@ class CommentControllerTest {
     }
 
     @Test
-    @WithMockUser
-    void postComment() throws JsonProcessingException, UnsupportedEncodingException {
+    @WithMockUser(username = "username")
+    void postComment() throws Exception {
+        CommentDto expected = getCommentDto();
         PostCommentRequestDto requestDto = new PostCommentRequestDto(
                 1L,
                 "some text"
@@ -61,8 +64,8 @@ class CommentControllerTest {
         MvcResult result = mockMvc.perform(post("/api/comments")
                 .content(jsonRequest)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andReturn();
 
         CommentDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(), CommentDto.class);
@@ -70,11 +73,38 @@ class CommentControllerTest {
 
         EqualsBuilder.reflectionEquals(
                 expected,
-                actual
+                actual,
+                "timestamp"
         );
     }
 
     @Test
-    void getCommentsForTask() {
+    @WithMockUser
+    void getCommentsForTask() throws Exception {
+        List<CommentDto> expected = List.of(getCommentDto());
+
+        MvcResult result = mockMvc.perform(get("/api/comments")
+                        .param("taskId", "1"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        CommentDto[] actual = objectMapper
+                .readValue(result.getResponse().getContentAsString(), CommentDto[].class);
+        Assertions.assertNotNull(actual);
+
+        EqualsBuilder.reflectionEquals(
+                expected,
+                actual,
+                "timestamp"
+        );
+    }
+
+    private CommentDto getCommentDto() {
+        return new CommentDto(
+                DEFAULT_ID,
+                DEFAULT_ID,
+                DEFAULT_ID,
+                LocalDateTime.now()
+        );
     }
 }
