@@ -1,5 +1,8 @@
 package layron.tms.service.comment;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +30,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 @ExtendWith(MockitoExtension.class)
 class CommentServiceImplTest {
     private static final Long DEFAULT_ID = 1L;
@@ -52,11 +52,11 @@ class CommentServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        LocalDateTime timestamp = LocalDateTime.now();
         comment = new Comment();
         comment.setId(DEFAULT_ID);
         comment.setTask(getTask());
         comment.setText(DEFAULT_TEXT);
+        LocalDateTime timestamp = LocalDateTime.now();
         comment.setTimestamp(timestamp);
         comment.setUser(getUser());
 
@@ -69,7 +69,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void saveComment_ok() throws UserNotFoundException {
+    void saveComment_WithValidRequest_Ok() throws UserNotFoundException {
         PostCommentRequestDto requestDto = getPostCommentRequestDto();
 
         setupUserAuthorization();
@@ -83,7 +83,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void getCommentsForTask() {
+    void getCommentsForTask_Ok() {
         Mockito.when(commentRepository.getCommentByTaskId(DEFAULT_ID)).thenReturn(List.of(comment));
         Mockito.when(commentMapper.toDto(comment)).thenReturn(commentDto);
 

@@ -1,5 +1,11 @@
 package layron.tms.service.task;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 import layron.tms.dto.task.CreateTaskRequestDto;
 import layron.tms.dto.task.TaskDto;
 import layron.tms.dto.task.UpdateTaskRequestDto;
@@ -19,12 +25,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class TaskServiceImplTest {
@@ -67,7 +67,7 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void createTask() {
+    void createTask_WithValidRequest_Ok() {
         CreateTaskRequestDto requestDto = getCreateTaskRequestDto();
 
         Mockito.doReturn(task).when(taskMapper).toEntity(requestDto);
@@ -79,7 +79,7 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void getTasksForProject() {
+    void getTasksForProject_WithValidTask_Ok() {
         Mockito.doReturn(List.of(task)).when(taskRepository).findByProjectId(DEFAULT_ID);
         Mockito.doReturn(taskDto).when(taskMapper).toDto(task);
 
@@ -89,7 +89,7 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void getTask() {
+    void getTask_Ok() {
         Mockito.doReturn(task).when(taskRepository).findByProjectIdAndId(DEFAULT_ID, DEFAULT_ID);
         Mockito.doReturn(taskDto).when(taskMapper).toDto(task);
 
@@ -99,7 +99,7 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void updateTask() {
+    void updateTask_WithValidRequest_Ok() {
         UpdateTaskRequestDto requestDto = getUpdateTaskRequestDto();
 
         Mockito.doReturn(task).when(taskMapper).toEntity(requestDto);
@@ -112,7 +112,7 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void deleteTask() {
+    void deleteTask_Ok() {
         taskService.deleteTask(DEFAULT_ID);
         Mockito.verify(taskRepository, Mockito.times(1))
                 .deleteById(DEFAULT_ID);

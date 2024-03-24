@@ -1,6 +1,15 @@
 package layron.tms.controller;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.util.List;
 import layron.tms.dto.task.CreateTaskRequestDto;
 import layron.tms.dto.task.TaskDto;
 import layron.tms.dto.task.UpdateTaskRequestDto;
@@ -20,32 +29,24 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
 @Sql(scripts = {
-        "classpath:database/delete-all-from-comments.sql",
-        "classpath:database/delete-all-from-tasks.sql",
-        "classpath:database/delete-all-from-projects.sql",
-        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
         "classpath:database/insert-testing-project.sql",
-        "classpath:database/insert-testing-task.sql",
-        "classpath:database/insert-testing-comment.sql"
+        "classpath:database/insert-testing-task.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-tasks.sql",
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TaskControllerTest {
     protected static MockMvc mockMvc;
     private static final Long DEFAULT_ID = 1L;
-    public static final String DEFAULT_NAME = "task";
-    public static final int DEFAULT_STATUS = 1;
-    public static final int DEFAULT_PRIORITY = 1;
-    public static final LocalDate DEFAULT_DUE_DATE = LocalDate.now().plusDays(1);
+    private static final String DEFAULT_NAME = "task";
+    private static final int DEFAULT_STATUS = 1;
+    private static final int DEFAULT_PRIORITY = 1;
+    private static final LocalDate DEFAULT_DUE_DATE = LocalDate.now().plusDays(1);
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -59,7 +60,7 @@ class TaskControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void createTask() throws Exception {
+    void createTask_WithValidRequest_Ok() throws Exception {
         CreateTaskRequestDto requestDto = new CreateTaskRequestDto(
                 DEFAULT_NAME,
                 DEFAULT_PRIORITY,
@@ -72,8 +73,8 @@ class TaskControllerTest {
         MvcResult result = mockMvc.perform(post("/api/1/tasks")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
+                    .andExpect(status().isCreated())
+                    .andReturn();
 
         TaskDto actual = objectMapper
                 .readValue(result.getResponse().getContentAsString(), TaskDto.class);
@@ -84,7 +85,7 @@ class TaskControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void getTasksForProject() throws Exception {
+    void getTasksForProject_Ok() throws Exception {
         List<TaskDto> expected = List.of(getTaskDto());
 
         MvcResult result = mockMvc.perform(get("/api/1/tasks"))
@@ -100,7 +101,7 @@ class TaskControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void getTask() throws Exception {
+    void getTask_WithValidId_Ok() throws Exception {
         TaskDto expected = getTaskDto();
 
         MvcResult result = mockMvc.perform(get("/api/1/tasks/1"))
@@ -116,7 +117,7 @@ class TaskControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void updateTask() throws Exception {
+    void updateTask_WithValidRequest_Ok() throws Exception {
         UpdateTaskRequestDto requestDto = new UpdateTaskRequestDto(
                 DEFAULT_NAME,
                 DEFAULT_PRIORITY,
@@ -130,8 +131,8 @@ class TaskControllerTest {
         MvcResult result = mockMvc.perform(put("/api/1/tasks/1")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isAccepted())
-                .andReturn();
+                    .andExpect(status().isAccepted())
+                    .andReturn();
 
         TaskDto actual = objectMapper
                 .readValue(result.getResponse().getContentAsString(), TaskDto.class);
@@ -142,7 +143,7 @@ class TaskControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void deleteTask() throws Exception {
+    void deleteTask_Ok() throws Exception {
         mockMvc.perform(delete("/api/1/tasks/1"))
                 .andExpect(status().isOk())
                 .andReturn();

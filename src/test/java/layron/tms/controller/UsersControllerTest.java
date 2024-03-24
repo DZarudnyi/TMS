@@ -1,6 +1,13 @@
 package layron.tms.controller;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import layron.tms.dto.user.UpdateUserRequestDto;
 import layron.tms.dto.user.UpdateUserRoleRequestDto;
 import layron.tms.dto.user.UpdateUserRoleResponseDto;
@@ -19,30 +26,25 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDate;
-import java.util.Set;
-
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @Sql(scripts = {
-        "classpath:database/delete-all-from-comments.sql",
-        "classpath:database/delete-all-from-tasks.sql",
-        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-roles.sql",
         "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
-        "classpath:database/insert-testing-project.sql",
-        "classpath:database/insert-testing-task.sql",
-        "classpath:database/insert-testing-comment.sql"
+        "classpath:database/insert-testing-roles.sql",
+        "classpath:database/insert-testing-users-roles.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-users-roles.sql",
+        "classpath:database/delete-all-from-roles.sql",
+        "classpath:database/delete-all-from-users.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UsersControllerTest {
     protected static MockMvc mockMvc;
     private static final Long DEFAULT_ID = 1L;
-    public static final String DEFAULT_EMAIL = "email@example.com";
-    public static final String DEFAULT_FIRST_NAME = "John";
-    public static final String DEFAULT_LAST_NAME = "Doe";
+    private static final String DEFAULT_EMAIL = "email@example.com";
+    private static final String DEFAULT_FIRST_NAME = "John";
+    private static final String DEFAULT_LAST_NAME = "Doe";
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -55,8 +57,8 @@ class UsersControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username")
-    void updateRole() throws Exception {
+    @WithMockUser(username = "username", roles = {"ADMIN"})
+    void updateRole_WithValidRequest_Ok() throws Exception {
         UpdateUserRoleResponseDto expected = new UpdateUserRoleResponseDto(
                 DEFAULT_ID,
                 DEFAULT_EMAIL,
@@ -67,14 +69,16 @@ class UsersControllerTest {
         UpdateUserRoleRequestDto requestDto = new UpdateUserRoleRequestDto(Set.of(2L));
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(put("/api/users/1/role").
-                content(jsonRequest)
-                .contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc.perform(put("/api/users/1/role")
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())
                 .andReturn();
 
-        UpdateUserRoleResponseDto actual = objectMapper
-                .readValue(result.getResponse().getContentAsString(), UpdateUserRoleResponseDto.class);
+        UpdateUserRoleResponseDto actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                UpdateUserRoleResponseDto.class
+        );
         Assertions.assertNotNull(actual);
 
         EqualsBuilder.reflectionEquals(expected, actual);
@@ -82,7 +86,20 @@ class UsersControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void getMyProfile() throws Exception {
+    void updateRole_WithUserRole_ReturnsStatus403() throws Exception {
+        UpdateUserRoleRequestDto requestDto = new UpdateUserRoleRequestDto(Set.of(2L));
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+
+        mockMvc.perform(put("/api/users/1/role")
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "username")
+    void getMyProfile_Ok() throws Exception {
         UserDto expected = getUserDto();
 
         MvcResult result = mockMvc.perform(get("/api/users/me"))
@@ -98,10 +115,18 @@ class UsersControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void updateMyProfile() throws Exception {
-        //TODO: update user properly
-        UpdateUserRequestDto requestDto = new UpdateUserRequestDto();
-        UserDto expected = getUserDto();
+    void updateMyProfile_WithValidRequest_Ok() throws Exception {
+        UpdateUserRequestDto requestDto = new UpdateUserRequestDto(
+                DEFAULT_EMAIL,
+                "John",
+                "Doesn't"
+        );
+        UserDto expected = new UserDto(
+                DEFAULT_ID,
+                DEFAULT_EMAIL,
+                "John",
+                "Doesn't"
+        );
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         MvcResult result = mockMvc.perform(patch("/api/users/me")

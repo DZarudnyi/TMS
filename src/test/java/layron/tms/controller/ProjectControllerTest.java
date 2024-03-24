@@ -28,22 +28,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
-        "classpath:database/delete-all-from-comments.sql",
-        "classpath:database/delete-all-from-tasks.sql",
-        "classpath:database/delete-all-from-projects.sql",
-        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
-        "classpath:database/insert-testing-project.sql",
-        "classpath:database/insert-testing-task.sql",
-        "classpath:database/insert-testing-comment.sql"
+        "classpath:database/insert-testing-project.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProjectControllerTest {
     protected static MockMvc mockMvc;
     private static final Long DEFAULT_ID = 1L;
-    public static final String DEFAULT_NAME = "project";
-    public static final String DEFAULT_DESCRIPTION = "description";
-    public static final LocalDate DEFAULT_END_DATE = LocalDate.now().plusDays(1);
+    private static final String DEFAULT_NAME = "project";
+    private static final String DEFAULT_DESCRIPTION = "description";
+    private static final LocalDate DEFAULT_END_DATE = LocalDate.now().plusDays(1);
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -57,7 +55,7 @@ class ProjectControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void createProject() throws Exception {
+    void createProject_WithValidRequest_Ok() throws Exception {
         CreateProjectRequestDto requestDto = new CreateProjectRequestDto(
                 DEFAULT_NAME,
                 DEFAULT_DESCRIPTION,
@@ -71,8 +69,8 @@ class ProjectControllerTest {
         MvcResult result = mockMvc.perform(post("/api/projects")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
+                    .andExpect(status().isCreated())
+                    .andReturn();
 
         ProjectDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(), ProjectDto.class);
@@ -83,15 +81,17 @@ class ProjectControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void getUserProjects() throws Exception {
+    void getUserProjects_Ok() throws Exception {
         List<ProjectDto> expected = List.of(getProjectDto());
 
         MvcResult result = mockMvc.perform(get("/api/projects"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        ProjectDto[] actual =
-                objectMapper.readValue(result.getResponse().getContentAsString(), ProjectDto[].class);
+        ProjectDto[] actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                ProjectDto[].class
+        );
         Assertions.assertNotNull(actual);
 
         EqualsBuilder.reflectionEquals(expected, actual);
@@ -99,7 +99,7 @@ class ProjectControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void getProject() throws Exception {
+    void getProject_WithValidId_Ok() throws Exception {
         ProjectDto expected = getProjectDto();
 
         MvcResult result = mockMvc.perform(get("/api/projects/1"))
@@ -115,7 +115,7 @@ class ProjectControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void updateProject() throws Exception {
+    void updateProject_WithValidRequest_Ok() throws Exception {
         UpdateProjectRequestDto requestDto = new UpdateProjectRequestDto(
                 DEFAULT_NAME,
                 DEFAULT_DESCRIPTION,
@@ -139,7 +139,7 @@ class ProjectControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void deleteProject() throws Exception {
+    void deleteProject_Ok() throws Exception {
         mockMvc.perform(delete("/api/projects/1"))
                 .andExpect(status().isOk())
                 .andReturn();

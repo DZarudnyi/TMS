@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import layron.tms.dto.comment.CommentDto;
 import layron.tms.dto.comment.PostCommentRequestDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -26,15 +25,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
-        "classpath:database/delete-all-from-comments.sql",
-        "classpath:database/delete-all-from-tasks.sql",
-        "classpath:database/delete-all-from-projects.sql",
-        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
         "classpath:database/insert-testing-project.sql",
         "classpath:database/insert-testing-task.sql",
         "classpath:database/insert-testing-comment.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-comments.sql",
+        "classpath:database/delete-all-from-tasks.sql",
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CommentControllerTest {
     protected static MockMvc mockMvc;
@@ -52,7 +53,7 @@ class CommentControllerTest {
 
     @Test
     @WithMockUser(username = "username")
-    void postComment() throws Exception {
+    void postComment_WithValidRequest_Ok() throws Exception {
         CommentDto expected = getCommentDto();
         PostCommentRequestDto requestDto = new PostCommentRequestDto(
                 1L,
@@ -64,8 +65,8 @@ class CommentControllerTest {
         MvcResult result = mockMvc.perform(post("/api/comments")
                 .content(jsonRequest)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isCreated())
-            .andReturn();
+                .andExpect(status().isCreated())
+                .andReturn();
 
         CommentDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(), CommentDto.class);
@@ -80,7 +81,7 @@ class CommentControllerTest {
 
     @Test
     @WithMockUser
-    void getCommentsForTask() throws Exception {
+    void getCommentsForTask_Ok() throws Exception {
         List<CommentDto> expected = List.of(getCommentDto());
 
         MvcResult result = mockMvc.perform(get("/api/comments")

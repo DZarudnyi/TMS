@@ -1,5 +1,7 @@
 package layron.tms.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import layron.tms.exception.UserNotFoundException;
 import layron.tms.model.User;
 import org.junit.jupiter.api.Test;
@@ -8,12 +10,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Sql(scripts = {
-        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-users.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
@@ -21,7 +23,7 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    void findByEmail() throws UserNotFoundException {
+    void findByEmail_WithValidEmail_Ok() throws UserNotFoundException {
         User actual = userRepository.findByEmail("email@example.com")
                 .orElseThrow(() -> new UserNotFoundException("No user with such email"));
 
@@ -30,7 +32,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findByUsername() throws UserNotFoundException {
+    void findByUsername_WithValidUsername_Ok() throws UserNotFoundException {
         User actual = userRepository.findByUsername("username")
                 .orElseThrow(() -> new UserNotFoundException("No user with such email"));
 

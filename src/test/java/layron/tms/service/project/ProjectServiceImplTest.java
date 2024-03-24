@@ -1,5 +1,12 @@
 package layron.tms.service.project;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import layron.tms.dto.project.CreateProjectRequestDto;
 import layron.tms.dto.project.ProjectDto;
 import layron.tms.dto.project.UpdateProjectRequestDto;
@@ -23,13 +30,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceImplTest {
@@ -79,7 +79,7 @@ class ProjectServiceImplTest {
     }
 
     @Test
-    void save() throws UserNotFoundException {
+    void save_WithValidRequest_Ok() throws UserNotFoundException {
         user = getUser();
         setupUserAuthorization();
         CreateProjectRequestDto requestDto = getCreateProjectRequestDto();
@@ -96,22 +96,22 @@ class ProjectServiceImplTest {
     }
 
     @Test
-    void getUserProjects() {
+    void getUserProjects_Ok() {
         user = getUser();
         setupUserAuthorization();
-        List<ProjectDto> expected = List.of(projectDto);
 
         Mockito.doReturn(List.of(project))
                 .when(projectRepository).getProjectsByUserUsername(user.getUsername());
         Mockito.doReturn(projectDto).when(projectMapper).toDto(project);
 
+        List<ProjectDto> expected = List.of(projectDto);
         List<ProjectDto> actual = projectService.getUserProjects();
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
 
     @Test
-    void getProjectById() {
+    void getProjectById_WithValidId_Ok() {
         Mockito.doReturn(project).when(projectRepository).getReferenceById(DEFAULT_ID);
         Mockito.doReturn(projectDto).when(projectMapper).toDto(project);
 
@@ -121,7 +121,7 @@ class ProjectServiceImplTest {
     }
 
     @Test
-    void updateProject() {
+    void updateProject_WithValidRequest_Ok() {
         UpdateProjectRequestDto requestDto = getUpdateProjectRequestDto();
 
         Mockito.doReturn(project).when(projectRepository).getReferenceById(DEFAULT_ID);
@@ -133,7 +133,7 @@ class ProjectServiceImplTest {
     }
 
     @Test
-    void deleteProjectById() {
+    void deleteProjectById_Ok() {
         projectService.deleteProjectById(DEFAULT_ID);
         Mockito.verify(projectRepository, Mockito.times(1))
                 .deleteById(DEFAULT_ID);

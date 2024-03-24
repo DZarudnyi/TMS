@@ -1,5 +1,9 @@
 package layron.tms.service.label;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
 import layron.tms.dto.label.CreateLabelRequestDto;
 import layron.tms.dto.label.LabelDto;
 import layron.tms.dto.label.UpdateLabelRequestDto;
@@ -13,10 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class LabelServiceImplTest {
@@ -48,7 +48,7 @@ class LabelServiceImplTest {
     }
 
     @Test
-    void createLabel() {
+    void createLabel_WithValidRequest_Ok() {
         CreateLabelRequestDto requestDto = getCreateLabelRequestDto();
         Mockito.doReturn(label).when(labelMapper).toEntity(requestDto);
         Mockito.doReturn(label).when(labelRepository).save(label);
@@ -60,19 +60,18 @@ class LabelServiceImplTest {
     }
 
     @Test
-    void getAllLabels() {
-        List<LabelDto> expected = List.of(labelDto);
-
+    void getAllLabels_Ok() {
         Mockito.doReturn(labelDto).when(labelMapper).toDto(label);
         Mockito.doReturn(List.of(label)).when(labelRepository).findAll();
 
+        List<LabelDto> expected = List.of(labelDto);
         List<LabelDto> actual = labelService.getAllLabels();
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
 
     @Test
-    void updateLabel() {
+    void updateLabel_WithValidRequest_Ok() {
         UpdateLabelRequestDto requestDto = getUpdateLabelRequestDto();
 
         Mockito.doReturn(label).when(labelMapper).toEntity(requestDto);
@@ -85,7 +84,7 @@ class LabelServiceImplTest {
     }
 
     @Test
-    void deleteLabel() {
+    void deleteLabel_Ok() {
         labelService.deleteLabel(DEFAULT_ID);
         Mockito.verify(labelRepository, Mockito.times(1))
                 .deleteById(DEFAULT_ID);

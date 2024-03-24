@@ -1,5 +1,10 @@
 package layron.tms.service.user;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.Optional;
+import java.util.Set;
 import layron.tms.config.SecurityConfig;
 import layron.tms.dto.user.UpdateUserRequestDto;
 import layron.tms.dto.user.UpdateUserRoleRequestDto;
@@ -7,7 +12,6 @@ import layron.tms.dto.user.UpdateUserRoleResponseDto;
 import layron.tms.dto.user.UserDto;
 import layron.tms.dto.user.UserRegistrationRequestDto;
 import layron.tms.dto.user.UserRegistrationResponseDto;
-import layron.tms.exception.RegistrationException;
 import layron.tms.exception.UserNotFoundException;
 import layron.tms.mapper.UserMapper;
 import layron.tms.model.Role;
@@ -26,12 +30,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -78,26 +76,8 @@ class UserServiceImplTest {
         );
     }
 
-    //TODO: find out how to mock SecurityConfig
-//    @Test
-//    void register() throws RegistrationException {
-//        UserRegistrationRequestDto requestDto = getUserRegistrationRequestDto();
-//        UserRegistrationResponseDto responseDto = getUserRegistrationResponseDto();
-//
-//        Mockito.doReturn(Optional.empty()).when(userRepository).findByEmail(DEFAULT_EMAIL);
-//        Mockito.doReturn(Optional.of(RoleName.ROLE_USER)).when(roleRepository).findByName(RoleName.ROLE_USER);
-//        Mockito.doReturn(user).when(userRepository).save(user);
-//        Mockito.doReturn(responseDto).when(userMapper).toUserResponse(user);
-////        Mockito.when(config.getPasswordEncoder().encode(DEFAULT_PASSWORD)).thenReturn(DEFAULT_PASSWORD);
-////        Mockito.doReturn(DEFAULT_PASSWORD).when(config).getPasswordEncoder().encode(DEFAULT_PASSWORD);
-//
-//        UserRegistrationResponseDto actual = userService.register(requestDto);
-//        assertNotNull(actual);
-//        assertEquals(responseDto, actual);
-//    }
-
     @Test
-    void getUser() throws UserNotFoundException {
+    void getUser_Ok() throws UserNotFoundException {
         setupUserAuthorization();
 
         Mockito.doReturn(Optional.of(user)).when(userRepository).findByUsername(DEFAULT_USERNAME);
@@ -109,13 +89,13 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUser() throws UserNotFoundException {
-        UpdateUserRequestDto requestDto = getUpdateUserRequestDto();
+    void updateUser_WithValidRequest_Ok() throws UserNotFoundException {
         setupUserAuthorization();
 
         Mockito.doReturn(Optional.of(user)).when(userRepository).findByUsername(DEFAULT_USERNAME);
         Mockito.doReturn(userDto).when(userMapper).toDto(user);
 
+        UpdateUserRequestDto requestDto = getUpdateUserRequestDto();
         UserDto actual = userService.updateUser(requestDto);
 
         assertNotNull(actual);
@@ -123,7 +103,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserRoles() throws UserNotFoundException {
+    void updateUserRoles_WithValidRequest_Ok() throws UserNotFoundException {
         UpdateUserRoleRequestDto requestDto = getUpdateUserRoleRequestDto();
         UpdateUserRoleResponseDto expected = getUpdateUserRoleResponseDto();
 

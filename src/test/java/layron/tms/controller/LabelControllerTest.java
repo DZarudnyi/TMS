@@ -27,20 +27,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
-        "classpath:database/delete-all-from-comments.sql",
-        "classpath:database/delete-all-from-tasks.sql",
-        "classpath:database/delete-all-from-projects.sql",
-        "classpath:database/delete-all-from-users.sql",
-        "classpath:database/insert-testing-user.sql",
-        "classpath:database/insert-testing-project.sql",
-        "classpath:database/insert-testing-task.sql",
-        "classpath:database/insert-testing-comment.sql"
+        "classpath:database/insert-testing-label.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-labels.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LabelControllerTest {
     protected static MockMvc mockMvc;
     private static final Long DEFAULT_ID = 1L;
-    public static final String DEFAULT_NAME = "label";
+    private static final String DEFAULT_NAME = "label";
     private static final String DEFAULT_COLOR = "red";
     @Autowired
     private ObjectMapper objectMapper;
@@ -55,7 +51,7 @@ class LabelControllerTest {
 
     @Test
     @WithMockUser
-    void createLabel() throws Exception {
+    void createLabel_WithValidRequest_Ok() throws Exception {
         CreateLabelRequestDto requestDto =
                 new CreateLabelRequestDto(DEFAULT_NAME, DEFAULT_COLOR);
 
@@ -66,8 +62,8 @@ class LabelControllerTest {
         MvcResult result = mockMvc.perform(post("/api/labels")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
+                    .andExpect(status().isCreated())
+                    .andReturn();
 
         LabelDto actual = objectMapper
                 .readValue(result.getResponse().getContentAsString(), LabelDto.class);
@@ -78,7 +74,7 @@ class LabelControllerTest {
 
     @Test
     @WithMockUser
-    void getAllLabels() throws Exception {
+    void getAllLabels_Ok() throws Exception {
         List<LabelDto> expected = List.of(getLabelDto());
 
         MvcResult result = mockMvc.perform(get("/api/labels"))
@@ -95,7 +91,7 @@ class LabelControllerTest {
 
     @Test
     @WithMockUser
-    void updateLabel() throws Exception {
+    void updateLabel_WithValidRequest_Ok() throws Exception {
         UpdateLabelRequestDto requestDto =
                 new UpdateLabelRequestDto(DEFAULT_NAME, DEFAULT_COLOR);
 
@@ -106,8 +102,8 @@ class LabelControllerTest {
         MvcResult result = mockMvc.perform(put("/api/labels/1")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isAccepted())
-                .andReturn();
+                    .andExpect(status().isAccepted())
+                    .andReturn();
 
         LabelDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), LabelDto.class);
@@ -119,7 +115,7 @@ class LabelControllerTest {
 
     @Test
     @WithMockUser
-    void deleteLabel() throws Exception {
+    void deleteLabel_Ok() throws Exception {
         mockMvc.perform(delete("/api/labels/1"))
                 .andExpect(status().isOk())
                 .andReturn();

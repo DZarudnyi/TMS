@@ -1,5 +1,8 @@
 package layron.tms.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import layron.tms.model.Project;
 import layron.tms.model.Status;
 import org.junit.jupiter.api.Test;
@@ -8,16 +11,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @Sql(scripts = {
-        "classpath:database/delete-all-from-projects.sql",
-        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
         "classpath:database/insert-testing-project.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProjectRepositoryTest {
@@ -25,7 +26,7 @@ class ProjectRepositoryTest {
     private ProjectRepository projectRepository;
 
     @Test
-    void getProjectsByUserUsername() {
+    void getProjectsByUserUsername_WithValidUsername_Ok() {
         List<Project> actual = projectRepository.getProjectsByUserUsername("username");
 
         assertEquals(1, actual.size());
