@@ -17,3 +17,10 @@ databaseChangeLog:
       file: db/changelog/changes/08-create-attachments-table.yaml
   - include:
       file: db/changelog/changes/09-insert-roles.yaml
+  - include:
+      file: db/changelog/changes/10-insert-users.yaml
+  - include:
+      file: db/changelog/changes/11-insert-users-roles.yaml
+  - include:
+      file: db/changelog/changes/12-create-tasks-labels-table.yaml
+

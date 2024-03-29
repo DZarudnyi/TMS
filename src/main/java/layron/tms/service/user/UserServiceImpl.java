@@ -36,8 +36,9 @@ public class UserServiceImpl implements UserService {
             throw new RegistrationException("User already exists!");
         }
         User user = new User();
-        user.setEmail(requestDto.getEmail());
+        user.setUsername(requestDto.getUsername());
         user.setPassword(config.getPasswordEncoder().encode(requestDto.getPassword()));
+        user.setEmail(requestDto.getEmail());
         user.setFirstName(requestDto.getFirstName());
         user.setLastName(requestDto.getLastName());
         Role role = roleRepository.findByName(RoleName.ROLE_USER)

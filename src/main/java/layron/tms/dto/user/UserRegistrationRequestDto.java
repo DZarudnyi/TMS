@@ -14,14 +14,17 @@ import org.hibernate.validator.constraints.Length;
 @FieldMatch(firstString = "password", secondString = "repeatPassword")
 public class UserRegistrationRequestDto {
     @NotBlank
-    @Email
-    private String email;
+    @Length(min = 4, max = 35)
+    private String username;
     @NotBlank
     @Length(min = 4, max = 35)
     private String password;
     @NotBlank
     @Length(min = 4, max = 35)
     private String repeatPassword;
+    @NotBlank
+    @Email
+    private String email;
     @NotBlank
     private String firstName;
     @NotBlank

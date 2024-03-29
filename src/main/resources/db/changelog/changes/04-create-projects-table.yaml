@@ -33,7 +33,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: status
-                  type: tinyint
+                  type: int
                   constraints:
                     nullable: false
               - column:

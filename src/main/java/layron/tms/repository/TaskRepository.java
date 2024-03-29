@@ -9,12 +9,14 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t "
             + "FROM Task t "
             + "JOIN FETCH t.project tp "
+            + "JOIN FETCH t.labels tl "
             + "WHERE tp.id = (:projectId)")
     List<Task> findByProjectId(Long projectId);
 
     @Query("SELECT t "
             + "FROM Task t "
             + "JOIN FETCH t.project tp "
+            + "JOIN FETCH t.labels tl "
             + "WHERE tp.id = (:projectId) "
             + "AND t.id = (:id)")
     Task findByProjectIdAndId(Long projectId, Long id);
