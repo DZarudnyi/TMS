@@ -23,4 +23,11 @@ databaseChangeLog:
       file: db/changelog/changes/11-insert-users-roles.yaml
   - include:
       file: db/changelog/changes/12-create-tasks-labels-table.yaml
-
+  - include:
+      file: db/changelog/changes/13-insert-projects.yaml
+  - include:
+      file: db/changelog/changes/14-insert-tasks.yaml
+  - include:
+      file: db/changelog/changes/15-insert-labels.yaml
+  - include:
+      file: db/changelog/changes/16-insert-tasks-labels.yaml
