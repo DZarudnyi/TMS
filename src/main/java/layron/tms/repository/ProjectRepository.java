@@ -11,4 +11,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             + "JOIN FETCH p.user pu "
             + "WHERE pu.username = (:username)")
     List<Project> getProjectsByUserUsername(String username);
+
+    @Query("SELECT p "
+            + "FROM Project p "
+            + "JOIN FETCH p.user pu "
+            + "WHERE p.id = (:id)")
+    Project getProjectById(Long id);
 }

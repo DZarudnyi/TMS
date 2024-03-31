@@ -33,7 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @ExtendWith(MockitoExtension.class)
 class CommentServiceImplTest {
     private static final Long DEFAULT_ID = 1L;
-    private static final String DEFAULT_TEXT = "This is a comment";
+    private static final String DEFAULT_TEXT = "some text";
     private Comment comment;
     private CommentDto commentDto;
 
@@ -64,6 +64,7 @@ class CommentServiceImplTest {
                 DEFAULT_ID,
                 DEFAULT_ID,
                 DEFAULT_ID,
+                DEFAULT_TEXT,
                 timestamp
         );
     }

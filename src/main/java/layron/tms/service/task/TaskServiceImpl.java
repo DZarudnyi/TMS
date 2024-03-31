@@ -4,6 +4,7 @@ import java.util.List;
 import layron.tms.dto.task.CreateTaskRequestDto;
 import layron.tms.dto.task.TaskDto;
 import layron.tms.dto.task.UpdateTaskRequestDto;
+import layron.tms.exception.TaskNotFoundException;
 import layron.tms.mapper.TaskMapper;
 import layron.tms.model.Project;
 import layron.tms.model.Status;
@@ -37,8 +38,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto getTask(Long projectId, Long id) {
-        return taskMapper.toDto(taskRepository.findByProjectIdAndId(projectId, id));
+    public TaskDto getTask(Long id) throws TaskNotFoundException {
+        return taskMapper.toDto(
+                taskRepository.findTaskById(id)
+                        .orElseThrow(() -> new TaskNotFoundException("No task with id = " + id))
+        );
     }
 
     @Override

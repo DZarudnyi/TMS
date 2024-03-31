@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-users-roles.sql",
         "classpath:database/delete-all-from-roles.sql",
         "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",

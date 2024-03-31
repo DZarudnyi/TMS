@@ -25,6 +25,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-comments.sql",
+        "classpath:database/delete-all-from-tasks-labels.sql",
+        "classpath:database/delete-all-from-tasks.sql",
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users-roles.sql",
+        "classpath:database/delete-all-from-roles.sql",
+        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
         "classpath:database/insert-testing-project.sql",
         "classpath:database/insert-testing-task.sql",
@@ -40,6 +47,7 @@ import org.springframework.web.context.WebApplicationContext;
 class CommentControllerTest {
     protected static MockMvc mockMvc;
     private static final Long DEFAULT_ID = 1L;
+    private static final String DEFAULT_TEXT = "some text";
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -105,6 +113,7 @@ class CommentControllerTest {
                 DEFAULT_ID,
                 DEFAULT_ID,
                 DEFAULT_ID,
+                DEFAULT_TEXT,
                 LocalDateTime.now()
         );
     }

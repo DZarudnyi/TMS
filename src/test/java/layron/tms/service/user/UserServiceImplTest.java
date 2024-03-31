@@ -5,19 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Optional;
 import java.util.Set;
-import layron.tms.config.SecurityConfig;
 import layron.tms.dto.user.UpdateUserRequestDto;
 import layron.tms.dto.user.UpdateUserRoleRequestDto;
 import layron.tms.dto.user.UpdateUserRoleResponseDto;
 import layron.tms.dto.user.UserDto;
-import layron.tms.dto.user.UserRegistrationRequestDto;
-import layron.tms.dto.user.UserRegistrationResponseDto;
 import layron.tms.exception.UserNotFoundException;
 import layron.tms.mapper.UserMapper;
 import layron.tms.model.Role;
 import layron.tms.model.RoleName;
 import layron.tms.model.User;
-import layron.tms.repository.RoleRepository;
 import layron.tms.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,13 +43,9 @@ class UserServiceImplTest {
     @Mock
     private UserMapper userMapper;
     @Mock
-    private RoleRepository roleRepository;
-    @Mock
     private Authentication authentication;
     @Mock
     private SecurityContext securityContext;
-    @Mock
-    private SecurityConfig config;
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -124,25 +116,6 @@ class UserServiceImplTest {
         );
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-    }
-
-    private UserRegistrationRequestDto getUserRegistrationRequestDto() {
-        return new UserRegistrationRequestDto(
-                DEFAULT_EMAIL,
-                DEFAULT_PASSWORD,
-                DEFAULT_PASSWORD,
-                DEFAULT_NAME,
-                DEFAULT_SURNAME
-        );
-    }
-
-    private UserRegistrationResponseDto getUserRegistrationResponseDto() {
-        return new UserRegistrationResponseDto(
-                DEFAULT_ID,
-                DEFAULT_EMAIL,
-                DEFAULT_NAME,
-                DEFAULT_SURNAME
-        );
     }
 
     private UpdateUserRequestDto getUpdateUserRequestDto() {

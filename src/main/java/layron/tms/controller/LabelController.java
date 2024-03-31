@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/labels")
+@RequestMapping("/labels")
 public class LabelController {
     private final LabelService labelService;
 

@@ -1,5 +1,6 @@
 package layron.tms.service.user;
 
+import jakarta.transaction.Transactional;
 import java.util.Set;
 import layron.tms.config.SecurityConfig;
 import layron.tms.dto.user.UpdateUserRequestDto;
@@ -80,6 +81,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UpdateUserRoleResponseDto updateUserRoles(
             Long id,
             UpdateUserRoleRequestDto requestDto

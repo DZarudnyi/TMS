@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-tasks-labels.sql",
+        "classpath:database/delete-all-from-labels.sql",
         "classpath:database/insert-testing-label.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = {

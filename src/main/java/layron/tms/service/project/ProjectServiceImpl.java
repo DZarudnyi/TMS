@@ -1,5 +1,6 @@
 package layron.tms.service.project;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import layron.tms.dto.project.CreateProjectRequestDto;
@@ -46,12 +47,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDto getProjectById(Long id) {
-        return projectMapper.toDto(projectRepository.getReferenceById(id));
+        return projectMapper.toDto(projectRepository.getProjectById(id));
     }
 
     @Override
+    @Transactional
     public ProjectDto updateProject(Long id, UpdateProjectRequestDto requestDto) {
-        Project projectFromDb = projectRepository.getReferenceById(id);
+        Project projectFromDb = projectRepository.getProjectById(id);
         projectFromDb.setName(requestDto.name());
         projectFromDb.setDescription(requestDto.description());
         projectFromDb.setEndDate(requestDto.endDate());

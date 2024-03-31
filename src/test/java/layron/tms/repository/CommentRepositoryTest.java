@@ -11,6 +11,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-comments.sql",
+        "classpath:database/delete-all-from-tasks.sql",
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
         "classpath:database/insert-testing-project.sql",
         "classpath:database/insert-testing-task.sql",

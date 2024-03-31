@@ -9,6 +9,7 @@ import java.util.Set;
 import layron.tms.dto.task.CreateTaskRequestDto;
 import layron.tms.dto.task.TaskDto;
 import layron.tms.dto.task.UpdateTaskRequestDto;
+import layron.tms.exception.TaskNotFoundException;
 import layron.tms.mapper.TaskMapper;
 import layron.tms.model.Priority;
 import layron.tms.model.Project;
@@ -89,11 +90,11 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void getTask_Ok() {
-        Mockito.doReturn(task).when(taskRepository).findByProjectIdAndId(DEFAULT_ID, DEFAULT_ID);
+    void getTask_Ok() throws TaskNotFoundException {
+        Mockito.doReturn(task).when(taskRepository).findTaskById(DEFAULT_ID);
         Mockito.doReturn(taskDto).when(taskMapper).toDto(task);
 
-        TaskDto actual = taskService.getTask(DEFAULT_ID, DEFAULT_ID);
+        TaskDto actual = taskService.getTask(DEFAULT_ID);
         assertNotNull(actual);
         assertEquals(taskDto, actual);
     }

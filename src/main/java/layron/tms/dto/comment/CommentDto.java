@@ -6,6 +6,7 @@ public record CommentDto(
         Long id,
         Long taskId,
         Long userId,
+        String text,
         LocalDateTime timestamp
 ) {
 }
