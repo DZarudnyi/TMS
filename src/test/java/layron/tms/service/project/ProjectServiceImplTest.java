@@ -112,7 +112,7 @@ class ProjectServiceImplTest {
 
     @Test
     void getProjectById_WithValidId_Ok() {
-        Mockito.doReturn(project).when(projectRepository).getReferenceById(DEFAULT_ID);
+        Mockito.doReturn(project).when(projectRepository).getProjectById(DEFAULT_ID);
         Mockito.doReturn(projectDto).when(projectMapper).toDto(project);
 
         ProjectDto actual = projectService.getProjectById(DEFAULT_ID);
@@ -124,7 +124,7 @@ class ProjectServiceImplTest {
     void updateProject_WithValidRequest_Ok() {
         UpdateProjectRequestDto requestDto = getUpdateProjectRequestDto();
 
-        Mockito.doReturn(project).when(projectRepository).getReferenceById(DEFAULT_ID);
+        Mockito.doReturn(project).when(projectRepository).getProjectById(DEFAULT_ID);
         Mockito.doReturn(projectDto).when(projectMapper).toDto(project);
 
         ProjectDto actual = projectService.updateProject(DEFAULT_ID, requestDto);

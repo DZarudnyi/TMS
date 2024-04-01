@@ -27,6 +27,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-tasks-labels.sql",
+        "classpath:database/delete-all-from-tasks.sql",
+        "classpath:database/delete-all-from-projects.sql",
         "classpath:database/delete-all-from-users-roles.sql",
         "classpath:database/delete-all-from-roles.sql",
         "classpath:database/delete-all-from-users.sql",
@@ -70,7 +73,7 @@ class UsersControllerTest {
         UpdateUserRoleRequestDto requestDto = new UpdateUserRoleRequestDto(Set.of(2L));
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(put("/api/users/1/role")
+        MvcResult result = mockMvc.perform(put("/users/1/role")
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())
@@ -91,7 +94,7 @@ class UsersControllerTest {
         UpdateUserRoleRequestDto requestDto = new UpdateUserRoleRequestDto(Set.of(2L));
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(put("/api/users/1/role")
+        mockMvc.perform(put("/users/1/role")
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
@@ -103,7 +106,7 @@ class UsersControllerTest {
     void getMyProfile_Ok() throws Exception {
         UserDto expected = getUserDto();
 
-        MvcResult result = mockMvc.perform(get("/api/users/me"))
+        MvcResult result = mockMvc.perform(get("/users/me"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -130,7 +133,7 @@ class UsersControllerTest {
         );
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(patch("/api/users/me")
+        MvcResult result = mockMvc.perform(patch("/users/me")
                 .content(jsonRequest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())

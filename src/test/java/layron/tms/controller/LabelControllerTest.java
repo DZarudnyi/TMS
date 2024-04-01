@@ -61,7 +61,7 @@ class LabelControllerTest {
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(post("/api/labels")
+        MvcResult result = mockMvc.perform(post("/labels")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
@@ -79,7 +79,7 @@ class LabelControllerTest {
     void getAllLabels_Ok() throws Exception {
         List<LabelDto> expected = List.of(getLabelDto());
 
-        MvcResult result = mockMvc.perform(get("/api/labels"))
+        MvcResult result = mockMvc.perform(get("/labels"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -101,7 +101,7 @@ class LabelControllerTest {
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(put("/api/labels/1")
+        MvcResult result = mockMvc.perform(put("/labels/1")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isAccepted())
@@ -118,7 +118,7 @@ class LabelControllerTest {
     @Test
     @WithMockUser
     void deleteLabel_Ok() throws Exception {
-        mockMvc.perform(delete("/api/labels/1"))
+        mockMvc.perform(delete("/labels/1"))
                 .andExpect(status().isOk())
                 .andReturn();
     }

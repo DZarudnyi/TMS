@@ -76,7 +76,7 @@ class TaskControllerTest {
         TaskDto expected = getTaskDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(post("/api/1/tasks")
+        MvcResult result = mockMvc.perform(post("/projects/1/tasks")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
@@ -94,7 +94,7 @@ class TaskControllerTest {
     void getTasksForProject_Ok() throws Exception {
         List<TaskDto> expected = List.of(getTaskDto());
 
-        MvcResult result = mockMvc.perform(get("/api/1/tasks"))
+        MvcResult result = mockMvc.perform(get("/projects/1/tasks"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -110,7 +110,7 @@ class TaskControllerTest {
     void getTask_WithValidId_Ok() throws Exception {
         TaskDto expected = getTaskDto();
 
-        MvcResult result = mockMvc.perform(get("/api/1/tasks/1"))
+        MvcResult result = mockMvc.perform(get("/projects/1/tasks/1"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -134,7 +134,7 @@ class TaskControllerTest {
         TaskDto expected = getTaskDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(put("/api/1/tasks/1")
+        MvcResult result = mockMvc.perform(put("/projects/1/tasks/1")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isAccepted())
@@ -150,7 +150,7 @@ class TaskControllerTest {
     @Test
     @WithMockUser(username = "username")
     void deleteTask_Ok() throws Exception {
-        mockMvc.perform(delete("/api/1/tasks/1"))
+        mockMvc.perform(delete("/projects/1/tasks/1"))
                 .andExpect(status().isOk())
                 .andReturn();
     }

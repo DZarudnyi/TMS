@@ -70,7 +70,7 @@ class CommentControllerTest {
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(post("/api/comments")
+        MvcResult result = mockMvc.perform(post("/comments")
                 .content(jsonRequest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -92,7 +92,7 @@ class CommentControllerTest {
     void getCommentsForTask_Ok() throws Exception {
         List<CommentDto> expected = List.of(getCommentDto());
 
-        MvcResult result = mockMvc.perform(get("/api/comments")
+        MvcResult result = mockMvc.perform(get("/comments")
                         .param("taskId", "1"))
                 .andExpect(status().isOk())
                 .andReturn();

@@ -28,7 +28,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-tasks-labels.sql",
+        "classpath:database/delete-all-from-tasks.sql",
         "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users-roles.sql",
+        "classpath:database/delete-all-from-roles.sql",
         "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql",
         "classpath:database/insert-testing-project.sql"
@@ -68,7 +72,7 @@ class ProjectControllerTest {
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(post("/api/projects")
+        MvcResult result = mockMvc.perform(post("/projects")
                     .content(jsonRequest)
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
@@ -86,7 +90,7 @@ class ProjectControllerTest {
     void getUserProjects_Ok() throws Exception {
         List<ProjectDto> expected = List.of(getProjectDto());
 
-        MvcResult result = mockMvc.perform(get("/api/projects"))
+        MvcResult result = mockMvc.perform(get("/projects"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -104,7 +108,7 @@ class ProjectControllerTest {
     void getProject_WithValidId_Ok() throws Exception {
         ProjectDto expected = getProjectDto();
 
-        MvcResult result = mockMvc.perform(get("/api/projects/1"))
+        MvcResult result = mockMvc.perform(get("/projects/1"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -126,7 +130,7 @@ class ProjectControllerTest {
         ProjectDto expected = getProjectDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
-        MvcResult result = mockMvc.perform(put("/api/projects/1")
+        MvcResult result = mockMvc.perform(put("/projects/1")
                 .content(jsonRequest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())
@@ -142,7 +146,7 @@ class ProjectControllerTest {
     @Test
     @WithMockUser(username = "username")
     void deleteProject_Ok() throws Exception {
-        mockMvc.perform(delete("/api/projects/1"))
+        mockMvc.perform(delete("/projects/1"))
                 .andExpect(status().isOk())
                 .andReturn();
     }

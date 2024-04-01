@@ -11,6 +11,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = {
+        "classpath:database/delete-all-from-tasks-labels.sql",
+        "classpath:database/delete-all-from-tasks.sql",
+        "classpath:database/delete-all-from-projects.sql",
+        "classpath:database/delete-all-from-users-roles.sql",
+        "classpath:database/delete-all-from-roles.sql",
         "classpath:database/delete-all-from-users.sql",
         "classpath:database/insert-testing-user.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -25,6 +30,7 @@ class UserRepositoryTest {
 
     @Test
     void findByEmail_WithValidEmail_Ok() throws UserNotFoundException {
+        userRepository.findAll();
         User actual = userRepository.findByEmail("email@example.com")
                 .orElseThrow(() -> new UserNotFoundException("No user with such email"));
 
@@ -35,7 +41,7 @@ class UserRepositoryTest {
     @Test
     void findByUsername_WithValidUsername_Ok() throws UserNotFoundException {
         User actual = userRepository.findByUsername("username")
-                .orElseThrow(() -> new UserNotFoundException("No user with such email"));
+                .orElseThrow(() -> new UserNotFoundException("No user with such username"));
 
         assertEquals("Doe", actual.getLastName());
         assertEquals("email@example.com", actual.getEmail());

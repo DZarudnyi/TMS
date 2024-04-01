@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import layron.tms.dto.task.CreateTaskRequestDto;
 import layron.tms.dto.task.TaskDto;
@@ -91,7 +92,7 @@ class TaskServiceImplTest {
 
     @Test
     void getTask_Ok() throws TaskNotFoundException {
-        Mockito.doReturn(task).when(taskRepository).findTaskById(DEFAULT_ID);
+        Mockito.doReturn(Optional.of(task)).when(taskRepository).findTaskById(DEFAULT_ID);
         Mockito.doReturn(taskDto).when(taskMapper).toDto(task);
 
         TaskDto actual = taskService.getTask(DEFAULT_ID);
