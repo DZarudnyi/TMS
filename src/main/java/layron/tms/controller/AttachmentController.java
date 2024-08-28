@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/attachments")
+@RequestMapping("/attachments")
 public class AttachmentController {
     private final AttachmentService attachmentService;
 

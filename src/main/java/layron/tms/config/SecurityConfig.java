@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/auth/**", "/error", "/swagger-ui/**")
+                                .requestMatchers("/auth/**", "/error", "/swagger-ui/**") //suppose i need to add /api before the links?
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
