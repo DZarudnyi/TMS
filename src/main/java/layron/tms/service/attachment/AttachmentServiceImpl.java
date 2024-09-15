@@ -1,12 +1,11 @@
 package layron.tms.service.attachment;
 
-import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,58 +13,56 @@ import java.util.List;
 import com.dropbox.core.v2.users.FullAccount;
 import jakarta.transaction.Transactional;
 import layron.tms.dto.attachment.AttachmentDto;
+import layron.tms.exception.FileTooBigException;
 import layron.tms.mapper.AttachmentMapper;
 import layron.tms.model.Attachment;
 import layron.tms.model.Task;
 import layron.tms.repository.AttachmentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-//@PropertySource("classpath:dropbox.properties")
 public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepository attachmentRepository;
     private final DbxClientV2 dropboxClient;
     private final AttachmentMapper attachmentMapper;
-//    @Value("${dropbox.auth.token}")
-//    String token;
 
     @Override
     @Transactional
-    public AttachmentDto upload(Long taskId, MultipartFile file) throws IOException, DbxException {
+    public AttachmentDto upload(Long taskId, MultipartFile file)
+            throws IOException, DbxException, FileTooBigException {
+        if (file.getSize() > 157286400L) {
+            throw new FileTooBigException("File size should be less than 150mb!");
+        }
+
         Attachment attachment = new Attachment();
         Task task = new Task();
         task.setId(taskId);
         attachment.setTask(task);
         attachment.setFilename(file.getName());
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes());
 
-//        DbxRequestConfig config = DbxRequestConfig.newBuilder("TMS/1.0").build();
-//
-//        DbxClientV2 dropboxClient = new DbxClientV2(config, token);
 
         FullAccount account = dropboxClient.users().getCurrentAccount();
-        System.out.println(account.getName().getDisplayName());
+        //System.out.println(account.getName().getDisplayName());
 
-        FileMetadata uploadMetadata = dropboxClient
+        try (InputStream in = new ByteArrayInputStream(file.getBytes())) {
+            //This way of uploading allows for files less than 150mb
+            FileMetadata uploadMetadata = dropboxClient
+                    .files()
+                    .uploadBuilder("/TMS/" + file.getOriginalFilename())
+                    .uploadAndFinish(in); //getting exception here; may be wrong input format
+            attachment.setUploadDate(LocalDateTime.now());
+            attachment.setDropboxFileId(uploadMetadata.getId());
+        }
 
-                .files()
-                .uploadBuilder("/TMS")
-                .uploadAndFinish(inputStream);
-        inputStream.close();
-
-        attachment.setUploadDate(LocalDateTime.now());
-        attachment.setDropboxFileId(uploadMetadata.getId());
         attachmentRepository.save(attachment);
         return attachmentMapper.toDto(attachment);
+
     }
 
     @Override

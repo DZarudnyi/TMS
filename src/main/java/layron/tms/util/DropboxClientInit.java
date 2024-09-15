@@ -2,6 +2,7 @@ package layron.tms.util;
 
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,18 +19,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-//@Configuration
-@Component
+@Configuration
+//@Component
 @RequiredArgsConstructor
 @PropertySource("classpath:dropbox.properties")
 @ConfigurationProperties(prefix = "dropbox.auth")
 public class DropboxClientInit {
     @Value("${dropbox.auth.token}")
-    private final String token = "";
+    private String token = "";
     @Value("${dropbox.auth.app.key}")
-    private final String appKey = "";
+    private String appKey = "";
 
-    //@Bean
+    @Bean
     public DbxClientV2 initDropboxClient() {
         DbxRequestConfig config = DbxRequestConfig.newBuilder("TMS/1.0").build();
         return new DbxClientV2(config, token);
