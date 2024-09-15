@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-tasks-labels
+      author: dzarudnyi
+      changes:
+        - insert:
+            tableName: tasks_labels
+            columns:
+              - column: { name: task_id, value: 1 }
+              - column: { name: label_id, value: 1 }
+        - insert:
+            tableName: tasks_labels
+            columns:
+              - column: { name: task_id, value: 2 }
+              - column: { name: label_id, value: 2 }
+        - insert:
+            tableName: tasks_labels
+            columns:
+              - column: { name: task_id, value: 3 }
+              - column: { name: label_id, value: 3 }

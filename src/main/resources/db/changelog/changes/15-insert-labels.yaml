@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-labels
+      author: dzarudnyi
+      changes:
+        - insert:
+            tableName: labels
+            columns:
+              - column: { name: name, value: "label1" }
+              - column: { name: color, value: "blue" }
+        - insert:
+            tableName: labels
+            columns:
+              - column: { name: name, value: "label2" }
+              - column: { name: color, value: "green" }
+        - insert:
+            tableName: labels
+            columns:
+              - column: { name: name, value: "label3" }
+              - column: { name: color, value: "red" }
