@@ -35,7 +35,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Transactional
     public AttachmentDto upload(Long taskId, MultipartFile file)
             throws IOException, DbxException, FileTooBigException {
-        if (file.getSize() > 157286400L) {
+        if (file.getSize() > 157286400L) { //150mb
             throw new FileTooBigException("File size should be less than 150mb!");
         }
 
@@ -43,25 +43,25 @@ public class AttachmentServiceImpl implements AttachmentService {
         Task task = new Task();
         task.setId(taskId);
         attachment.setTask(task);
-        attachment.setFilename(file.getName());
+        attachment.setFilename(file.getOriginalFilename());
 
 
 
         FullAccount account = dropboxClient.users().getCurrentAccount();
         //System.out.println(account.getName().getDisplayName());
 
-        try (InputStream in = new ByteArrayInputStream(file.getBytes())) {
-            //This way of uploading allows for files less than 150mb
-            FileMetadata uploadMetadata = dropboxClient
-                    .files()
-                    .uploadBuilder("/TMS/" + file.getOriginalFilename())
-                    .uploadAndFinish(in); //getting exception here; may be wrong input format
-            attachment.setUploadDate(LocalDateTime.now());
-            attachment.setDropboxFileId(uploadMetadata.getId());
-        }
+        //should add check for file in db/dropbox
+        //if this file is already in db - getting exception on save
+        //This way of uploading allows for files less than 150mb
+        FileMetadata uploadMetadata = dropboxClient
+                .files()
+                .uploadBuilder("/TMS/" + taskId + "/" + file.getOriginalFilename())
+                .uploadAndFinish(file.getInputStream());
+        attachment.setUploadDate(LocalDateTime.now());
+        attachment.setDropboxFileId(uploadMetadata.getId());
 
         attachmentRepository.save(attachment);
-        return attachmentMapper.toDto(attachment);
+        return attachmentMapper.toDto(attachment);//getting exception here;dto converts correctly, getting exception on return
 
     }
 
@@ -69,6 +69,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     public List<ResponseEntity<InputStreamResource>> getAttachmentsForTask(
             Long taskId
     ) throws DbxException {
+        //dropboxClient.files().listFolder(path) //не лізти зайвий раз в базу, а просто взяти в дропбоксі
 //        List<Attachment> attachmentsForTask = attachmentRepository.getAttachmentByTaskId(taskId);
 //        List<ResponseEntity<InputStreamResource>> downloadedFiles = new ArrayList<>();
 //        for (Attachment attachment : attachmentsForTask) {
