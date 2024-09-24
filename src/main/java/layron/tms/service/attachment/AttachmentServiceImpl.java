@@ -14,12 +14,15 @@ import com.dropbox.core.v2.users.FullAccount;
 import jakarta.transaction.Transactional;
 import layron.tms.dto.attachment.AttachmentDto;
 import layron.tms.exception.FileTooBigException;
+import layron.tms.exception.TaskNotFoundException;
 import layron.tms.mapper.AttachmentMapper;
 import layron.tms.model.Attachment;
 import layron.tms.model.Task;
 import layron.tms.repository.AttachmentRepository;
+import layron.tms.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepository attachmentRepository;
+    private final TaskRepository taskRepository;
     private final DbxClientV2 dropboxClient;
     private final AttachmentMapper attachmentMapper;
 
@@ -39,6 +43,10 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new FileTooBigException("File size should be less than 150mb!");
         }
 
+        //need to use global exception handler here
+        taskRepository.findTaskById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("No task with id = " + taskId));
+
         Attachment attachment = new Attachment();
         Task task = new Task();
         task.setId(taskId);
@@ -47,11 +55,14 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 
 
-        FullAccount account = dropboxClient.users().getCurrentAccount();
+        //FullAccount account = dropboxClient.users().getCurrentAccount();
         //System.out.println(account.getName().getDisplayName());
 
         //should add check for file in db/dropbox
         //if this file is already in db - getting exception on save
+
+        //If file already exists - update date in db, upload file to dropbox (there is automated versioning of files)
+
         //This way of uploading allows for files less than 150mb
         FileMetadata uploadMetadata = dropboxClient
                 .files()
