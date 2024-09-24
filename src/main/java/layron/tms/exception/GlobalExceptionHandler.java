@@ -36,19 +36,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, headers, status);
     }
 
-    //it works if you get rid of headers and status in method declaration
-    @ExceptionHandler({TaskNotFoundException.class})
+    @ExceptionHandler( {TaskNotFoundException.class} )
     protected ResponseEntity<Object> handleTaskNotFoundException(
-            TaskNotFoundException ex,
-            HttpHeaders headers,
-            HttpStatusCode status
+            TaskNotFoundException ex
     ) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST);
-        List<String> errors = ex.getMessage().lines().toList();
-        body.put("errors", errors);
-        return new ResponseEntity<>(body, headers, status);
+        return errorHandlerController(ex, HttpStatus.BAD_REQUEST);
     }
 
     private String getErrorMessage(ObjectError e) {
@@ -60,17 +52,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return e.getDefaultMessage();
     }
 
-    //since every handler will look the same - should think about making one method for constructing response
     private ResponseEntity<Object> errorHandlerController(
             Exception ex,
-            HttpHeaders headers,
             HttpStatus status
     ){
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST);
+        body.put("status", status);
         List<String> errors = ex.getMessage().lines().toList();
         body.put("errors", errors);
-        return new ResponseEntity<>(body, headers, status);
+        return new ResponseEntity<>(body, status);
     }
 }

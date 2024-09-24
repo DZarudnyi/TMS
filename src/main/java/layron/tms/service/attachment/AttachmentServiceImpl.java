@@ -43,7 +43,6 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new FileTooBigException("File size should be less than 150mb!");
         }
 
-        //need to use global exception handler here
         taskRepository.findTaskById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("No task with id = " + taskId));
 
