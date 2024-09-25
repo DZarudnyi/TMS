@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.dropbox.core.v2.users.FullAccount;
 import jakarta.transaction.Transactional;
@@ -52,25 +53,25 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setTask(task);
         attachment.setFilename(file.getOriginalFilename());
 
-
-
-        //FullAccount account = dropboxClient.users().getCurrentAccount();
-        //System.out.println(account.getName().getDisplayName());
-
         //should add check for file in db/dropbox
         //if this file is already in db - getting exception on save
-
         //If file already exists - update date in db, upload file to dropbox (there is automated versioning of files)
+        //Account for duplicate entries in db for files downloaded to dropbox
 
-        //This way of uploading allows for files less than 150mb
-        FileMetadata uploadMetadata = dropboxClient
+        FileMetadata uploadMetadata = dropboxClient  //This way of uploading allows for files less than 150mb
                 .files()
                 .uploadBuilder("/TMS/" + taskId + "/" + file.getOriginalFilename())
                 .uploadAndFinish(file.getInputStream());
         attachment.setUploadDate(LocalDateTime.now());
         attachment.setDropboxFileId(uploadMetadata.getId());
 
-        attachmentRepository.save(attachment);
+        Optional<Attachment> attachmentFromDb =
+                attachmentRepository.getAttachmentByDropboxFileId(attachment.getDropboxFileId());
+        if (attachmentFromDb.isEmpty()) {
+            attachmentRepository.save(attachment);
+        } else {
+            attachment.setId(attachmentFromDb.get().getId());
+        }
         return attachmentMapper.toDto(attachment);//getting exception here;dto converts correctly, getting exception on return
 
     }
