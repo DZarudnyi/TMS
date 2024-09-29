@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.dropbox.core.v2.users.FullAccount;
 import jakarta.transaction.Transactional;
 import layron.tms.dto.attachment.AttachmentDto;
 import layron.tms.exception.FileTooBigException;
@@ -53,27 +51,37 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setTask(task);
         attachment.setFilename(file.getOriginalFilename());
 
-        //should add check for file in db/dropbox
-        //if this file is already in db - getting exception on save
-        //If file already exists - update date in db, upload file to dropbox (there is automated versioning of files)
-        //Account for duplicate entries in db for files downloaded to dropbox
+        try {
+            //This way of uploading allows for files less than 150mb
+            FileMetadata uploadMetadata = dropboxClient
+                    .files()
+                    .uploadBuilder("/TMS/" + taskId + "/" + file.getOriginalFilename())
+                    .uploadAndFinish(file.getInputStream());
+            attachment.setUploadDate(LocalDateTime.now());
+            attachment.setDropboxFileId(uploadMetadata.getId());
 
-        FileMetadata uploadMetadata = dropboxClient  //This way of uploading allows for files less than 150mb
-                .files()
-                .uploadBuilder("/TMS/" + taskId + "/" + file.getOriginalFilename())
-                .uploadAndFinish(file.getInputStream());
-        attachment.setUploadDate(LocalDateTime.now());
-        attachment.setDropboxFileId(uploadMetadata.getId());
-
-        Optional<Attachment> attachmentFromDb =
-                attachmentRepository.getAttachmentByDropboxFileId(attachment.getDropboxFileId());
-        if (attachmentFromDb.isEmpty()) {
-            attachmentRepository.save(attachment);
-        } else {
-            attachment.setId(attachmentFromDb.get().getId());
+            Optional<Attachment> attachmentFromDb =
+                    attachmentRepository.getAttachmentByDropboxFileId(attachment.getDropboxFileId());
+            //checking if file is duplicate - already saved into db
+            if (attachmentFromDb.isEmpty()) {
+                attachmentRepository.save(attachment);
+            } else {
+                attachment.setId(attachmentFromDb.get().getId());
+            }
+            return attachmentMapper.toDto(attachment);
+        } catch (Exception ex) {
+            String attachmentId = attachment.getDropboxFileId();
+            //TODO: create abstract class for such checks, according to clean architecture
+            if (!dropboxClient
+                    .files()
+                    .searchV2(attachment.getFilePath() + "/" + attachment.getFilename())//TODO: Check correctness of pathing
+                    .getMatches()
+                    .isEmpty()
+            ) {
+                dropboxClient.files().deleteV2(attachment.getDropboxFileId());//TODO: find how to delete by file id
+            }
         }
-        return attachmentMapper.toDto(attachment);//getting exception here;dto converts correctly, getting exception on return
-
+        return new AttachmentDto(); //TODO: need to return empty constructor if nothing is saved
     }
 
     @Override

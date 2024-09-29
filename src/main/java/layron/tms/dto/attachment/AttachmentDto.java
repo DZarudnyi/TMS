@@ -9,4 +9,7 @@ public record AttachmentDto(
         String filename,
         LocalDateTime uploadDate
 ) {
+    public AttachmentDto() {
+        this(0L, 0L, "Empty", "Empty", LocalDateTime.now());
+    }
 }

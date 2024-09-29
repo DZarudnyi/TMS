@@ -30,6 +30,8 @@ public class Attachment {
     private String filename;
     @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;
+    @Column(name = "file_path", nullable = false)
+    private String filePath;
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 }

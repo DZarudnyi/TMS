@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-file-path-to-attachments
+      author: dzarudnyi
+      changes:
+        - addColumn:
+            tableName: attachments
+            columns:
+              - column:
+                  name: file_path
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
