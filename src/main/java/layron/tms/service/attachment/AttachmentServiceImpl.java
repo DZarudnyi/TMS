@@ -3,11 +3,7 @@ package layron.tms.service.attachment;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import jakarta.transaction.Transactional;
@@ -20,9 +16,6 @@ import layron.tms.model.Task;
 import layron.tms.repository.AttachmentRepository;
 import layron.tms.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +30,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     @Transactional
     public AttachmentDto upload(Long taskId, MultipartFile file)
-            throws IOException, DbxException, FileTooBigException {
+            throws DbxException, FileTooBigException {
         if (file.getSize() > 157286400L) { //150mb
             throw new FileTooBigException("File size should be less than 150mb!");
         }
@@ -63,6 +56,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             Optional<Attachment> attachmentFromDb =
                     attachmentRepository.getAttachmentByDropboxFileId(attachment.getDropboxFileId());
             //checking if file is duplicate - already saved into db
+            //potentially could count checksum instead?
             if (attachmentFromDb.isEmpty()) {
                 attachmentRepository.save(attachment);
             } else {
@@ -70,24 +64,38 @@ public class AttachmentServiceImpl implements AttachmentService {
             }
             return attachmentMapper.toDto(attachment);
         } catch (Exception ex) {
-            String attachmentId = attachment.getDropboxFileId();
+            //TODO: add a message
+            String attachmentPath = attachment.getFilePath() + "/" + attachment.getFilename();//TODO: Check correctness of pathing
             //TODO: create abstract class for such checks, according to clean architecture
             if (!dropboxClient
                     .files()
-                    .searchV2(attachment.getFilePath() + "/" + attachment.getFilename())//TODO: Check correctness of pathing
+                    .searchV2(attachmentPath)
                     .getMatches()
                     .isEmpty()
             ) {
-                dropboxClient.files().deleteV2(attachment.getDropboxFileId());//TODO: find how to delete by file id
+                dropboxClient
+                        .files()
+                        .deleteV2(attachmentPath);
             }
         }
-        return new AttachmentDto(); //TODO: need to return empty constructor if nothing is saved
+        return new AttachmentDto();
     }
 
     @Override
-    public List<ResponseEntity<InputStreamResource>> getAttachmentsForTask(
+    public List<AttachmentDto> getAttachmentsForTask(
             Long taskId
     ) throws DbxException {
+        //As an option, it might be better to get list of files from dropbox, not from db
+        //This might be a cheaper way, however if I use soft delete, then this approach won't work
+        //Getting tasks from db is also much easier
+
+        //Should I simply return the list, or download files?
+        //Probably return a list and add download as a separate method
+
+        return attachmentRepository.getAttachmentByTaskId(taskId).stream()
+                .map(attachmentMapper::toDto)
+                .toList();
+
         //dropboxClient.files().listFolder(path) //не лізти зайвий раз в базу, а просто взяти в дропбоксі
 //        List<Attachment> attachmentsForTask = attachmentRepository.getAttachmentByTaskId(taskId);
 //        List<ResponseEntity<InputStreamResource>> downloadedFiles = new ArrayList<>();
@@ -103,6 +111,6 @@ public class AttachmentServiceImpl implements AttachmentService {
 //            );
 //        }
 //        return downloadedFiles;
-        return new ArrayList<>();
+//        return new ArrayList<>();
     }
 }
