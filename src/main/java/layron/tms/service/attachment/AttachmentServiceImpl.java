@@ -1,8 +1,14 @@
 package layron.tms.service.attachment;
 
+import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -88,13 +94,23 @@ public class AttachmentServiceImpl implements AttachmentService {
         //As an option, it might be better to get list of files from dropbox, not from db
         //This might be a cheaper way, however if I use soft delete, then this approach won't work
         //Getting tasks from db is also much easier
+        //TODO: after retrieving dpx id - download file and pass to user
 
-        //Should I simply return the list, or download files?
-        //Probably return a list and add download as a separate method
-
-        return attachmentRepository.getAttachmentByTaskId(taskId).stream()
+        List<AttachmentDto> list = attachmentRepository.getAttachmentByTaskId(taskId).stream()
                 .map(attachmentMapper::toDto)
                 .toList();
+
+        //TODO: decide how i'll return files in output, check how stream works with json
+        try (OutputStream downloadResult = new FileOutputStream(File.createTempFile("tms", null))) {
+            for (AttachmentDto dto : list) {
+                dropboxClient.files().download("id:" + dto.dropboxFileId()).download(downloadResult);
+            }
+            return downloadResult.;
+        } catch (Exception ex) {
+            //
+        }
+
+        return ;
 
         //dropboxClient.files().listFolder(path) //не лізти зайвий раз в базу, а просто взяти в дропбоксі
 //        List<Attachment> attachmentsForTask = attachmentRepository.getAttachmentByTaskId(taskId);

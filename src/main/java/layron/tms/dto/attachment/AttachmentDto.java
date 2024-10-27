@@ -7,9 +7,15 @@ public record AttachmentDto(
         Long taskId,
         String dropboxFileId,
         String filename,
-        LocalDateTime uploadDate
+        LocalDateTime uploadDate,
+        String filePath
 ) {
     public AttachmentDto() {
-        this(0L, 0L, "Empty", "Empty", LocalDateTime.now());
+        this(
+                0L,
+                0L,
+                "Empty",
+                "Empty", LocalDateTime.now(),
+                "Empty");
     }
 }
