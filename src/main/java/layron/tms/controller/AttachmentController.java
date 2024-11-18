@@ -8,7 +8,9 @@ import layron.tms.exception.FileTooBigException;
 import layron.tms.exception.TaskNotFoundException;
 import layron.tms.service.attachment.AttachmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +35,7 @@ public class AttachmentController {
     }
 
     @GetMapping
-    public List<AttachmentDto> getAttachmentsForTask(
+    public List<ResponseEntity<Resource>> getAttachmentsForTask(
             @RequestParam Long taskId
     ) throws DbxException {
         return attachmentService.getAttachmentsForTask(taskId);

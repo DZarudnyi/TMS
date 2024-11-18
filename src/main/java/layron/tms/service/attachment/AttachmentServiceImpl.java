@@ -5,11 +5,9 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import jakarta.transaction.Transactional;
@@ -22,6 +20,9 @@ import layron.tms.model.Task;
 import layron.tms.repository.AttachmentRepository;
 import layron.tms.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,8 +88,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         return new AttachmentDto();
     }
 
+    //Response body? What is correct way to return file?
     @Override
-    public List<AttachmentDto> getAttachmentsForTask(
+    public List<ResponseEntity<Resource>> getAttachmentsForTask(
             Long taskId
     ) throws DbxException {
         //As an option, it might be better to get list of files from dropbox, not from db
@@ -100,9 +102,13 @@ public class AttachmentServiceImpl implements AttachmentService {
                 .map(attachmentMapper::toDto)
                 .toList();
 
+        //TODO: handle situation where file does not exist / path is incorrect
+
         //TODO: decide how i'll return files in output, check how stream works with json
         try (OutputStream downloadResult = new FileOutputStream(File.createTempFile("tms", null))) {
             for (AttachmentDto dto : list) {
+                //TODO: check correctness of path (is "id:" needs to be specified?)
+                //Resource resource =
                 dropboxClient.files().download("id:" + dto.dropboxFileId()).download(downloadResult);
             }
             return downloadResult.;
@@ -112,21 +118,28 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         return ;
 
+        //TODO: check solution under, it seems like a possible one...
         //dropboxClient.files().listFolder(path) //не лізти зайвий раз в базу, а просто взяти в дропбоксі
 //        List<Attachment> attachmentsForTask = attachmentRepository.getAttachmentByTaskId(taskId);
 //        List<ResponseEntity<InputStreamResource>> downloadedFiles = new ArrayList<>();
-//        for (Attachment attachment : attachmentsForTask) {
-//            DbxDownloader<FileMetadata> downloadedFile = dropboxClient
-//                    .files()
-//                    .download(attachment.getDropboxFileId());
-//            MediaType contentType = MediaType.parseMediaType(downloadedFile.getContentType());
-//            downloadedFiles.add(
-//                    ResponseEntity.ok()
-//                            .contentType(contentType)
-//                            .body(new InputStreamResource(downloadedFile.getInputStream()))
-//            );
+//        try (OutputStream downloadResult = new FileOutputStream(File.createTempFile("tms", null))) {
+//            for (Attachment attachment : attachmentsForTask) {
+//                 dropboxClient
+//                        .files()
+//                        .download(attachment.getDropboxFileId())
+//                        .download(downloadResult);
+//                downloadedFiles.add(
+//                        ResponseEntity.ok()
+//                                //.contentType(contentType)
+//                                .body(downloadResult)
+//                );
+//            }
+//            return downloadedFiles;
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
 //        }
-//        return downloadedFiles;
 //        return new ArrayList<>();
     }
 }
