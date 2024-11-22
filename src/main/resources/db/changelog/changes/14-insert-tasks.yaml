@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-tasks
+      author: dzarudnyi
+      changes:
+        - insert:
+            tableName: tasks
+            columns:
+              - column: { name: name, value: "Task1" }
+              - column: { name: priority, value: 1 }
+              - column: { name: status, value: 1 }
+              - column: { name: due_date, value: "2024-04-12" }
+              - column: { name: project_id, value: 1 }
+              - column: { name: assignee_id, value: 1 }
+        - insert:
+            tableName: tasks
+            columns:
+              - column: { name: name, value: "Task2" }
+              - column: { name: priority, value: 1 }
+              - column: { name: status, value: 1 }
+              - column: { name: due_date, value: "2024-04-14" }
+              - column: { name: project_id, value: 2 }
+              - column: { name: assignee_id, value: 2 }
+        - insert:
+            tableName: tasks
+            columns:
+              - column: { name: name, value: "Task3" }
+              - column: { name: priority, value: 1 }
+              - column: { name: status, value: 1 }
+              - column: { name: due_date, value: "2024-04-16" }
+              - column: { name: project_id, value: 3 }
+              - column: { name: assignee_id, value: 3 }

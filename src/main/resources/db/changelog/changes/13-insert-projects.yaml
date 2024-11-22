@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-projects
+      author: dzarudnyi
+      changes:
+        - insert:
+            tableName: projects
+            columns:
+              - column: { name: name, value: "Project1" }
+              - column: { name: description, value: "first project" }
+              - column: { name: start_date, value: "2024-03-28" }
+              - column: { name: end_date, value: "2024-04-28" }
+              - column: { name: status, value: 1 }
+              - column: { name: user_id, value: 1 }
+        - insert:
+            tableName: projects
+            columns:
+              - column: { name: name, value: "Project2" }
+              - column: { name: description, value: "second project" }
+              - column: { name: start_date, value: "2024-03-20" }
+              - column: { name: end_date, value: "2024-04-20" }
+              - column: { name: status, value: 1 }
+              - column: { name: user_id, value: 2 }
+        - insert:
+            tableName: projects
+            columns:
+              - column: { name: name, value: "Project3" }
+              - column: { name: description, value: "third project" }
+              - column: { name: start_date, value: "2024-03-22" }
+              - column: { name: end_date, value: "2024-04-22" }
+              - column: { name: status, value: 1 }
+              - column: { name: user_id, value: 3 }

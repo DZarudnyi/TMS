@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Maven stuff ###
+mvnw
+mvnw.cmd
+.mvn
+
+.env
+dropbox.properties
